@@ -24,6 +24,55 @@ function my_plot_setting(;color="blue",
 
 end
 
-my_plot_setting()
+function squares(num)
+    i = 1
+    
+    while i <= num
+        println("Square of $(i) is $(i * i)")
+        i+=1
+    end 
+    println("I am done!")
+end
 
+function squares_for(num::Integer)
+    for i = 1:num
+        println("Square of $(i) is $(i * i)")
+    end
+end
+
+function squares_lt(num::Integer)
+    i = 1
+    while i < num
+        println("Square of $(i) is $(i*i)")
+        i+=1
+    end
+
+end
+
+##Fizz  Buzz
+function fizzbuzz(num::Integer)
+    for i=1:num
+        if (i % 3 == 0) && (i % 5 == 0) 
+            println("FizzBuzz")
+        elseif (i % 3 == 0)
+            println("Fizz")
+        elseif (i % 5 == 0)
+            println("Buzz")
+        else
+            println(i)
+        end
+    end
+end
+#=
+
+=#
+function squares_and(num::Integer)
+    arr = Array{Int, 1}(undef, num) #1D array of num elements 
+    for i=1:num
+        push!(arr, i * i) #push into the array 
+    end
+    arr
+end
+
+squares_and(10)
 end
