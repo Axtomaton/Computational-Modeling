@@ -69,10 +69,17 @@ end
 function squares_and(num::Integer)
     arr = Array{Int, 1}(undef, num) #1D array of num elements 
     for i=1:num
-        push!(arr, i * i) #push into the array 
+        arr[i] = i * i
+        # push!(arr, i * i) #push into the array 
     end
     arr
 end
 
-squares_and(10)
+function squares_arr2(num::Integer)
+    [i * i for i = 1:num]
 end
+
+
+
+end
+
