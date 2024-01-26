@@ -33,7 +33,15 @@ For example:
     and they have the correct value.
 """
 function freqdist(iter)
-    ## your code here...
+    dict = Dict{Char, Integer}()
+    for item in iter
+        if haskey(dict, item)
+            dict[item] +=1
+        else
+            dict[item] = 1
+        end
+    end
+    return dict
 end
 
 ##-------------------------------------------------------------------------
@@ -50,6 +58,7 @@ Example:
     has_duplicates([8, 9, 4, 9, 10]) ## should return true.
 """
 function has_duplicates(arr)
+    return (length(Set(arr)) != length(arr)) #if the set which contains unique value is not the same size as arr, it has a dup.
     ## your code here
 end
 
@@ -81,7 +90,6 @@ but should instead use `numpeople`).:
    Your function should return this value.
 
 Example: 
-
     prob_same_bday(5) = 0.0222
     prob_same_bday(25) = 0.56
 
@@ -90,11 +98,13 @@ function prob_same_bday(numpeople)
     Random.seed!(1)
     samebday = 0
     for rep = 1:5000
-        ## your code goes here...
+        arr = rand(1:365, numpeople)
+        if length(arr) != length(Set(arr)) #we have a dup.
+            samebday += 1
+        end
     end
-    return samebday/5000
+    return samebday / 5000
 end
-
 
 ##-------------------------------------------------------------------------
 """
@@ -115,7 +125,7 @@ Examples:
     ## returns [(17, 75, 'a'), (35, 60, 'c'), (2, 25, 'd'), (31, 96, 'h')]
 """
 function sort_tuples(arr_tuples, idx)
-    ## your code here.
+    return sort!(arr_tuples, by = e -> e[idx])
 end
 
 
@@ -204,6 +214,24 @@ Dict(
 function numwords_each_letter(wordlist)
     ## your code here
 end
+
+##TESTING
+
+function main()
+    # println(freqdist("hello world")) ##WORKS
+    # has_duplicates([10, 15, 5, 8]) ## should return false. ##WORKS
+    # has_duplicates([8, 9, 4, 9, 10]) ## should return true. ##WORKS
+    # println(has_duplicates([10, 15, 5, 8])) ##WORKS
+    # println(has_duplicates([8, 9, 4, 9, 10])) ##WORKS
+    # println(prob_same_bday(5)) ##WORKS
+    # println(prob_same_bday(25)) ##WORKS
+    # println(sort_tuples([(35, 60, 'c'), (31, 96, 'h'), (2, 25, 'd'), (17, 75, 'a')], 3)) ##WORKS
+
+
+
+end
+
+main()
 
 
 end ## end module
