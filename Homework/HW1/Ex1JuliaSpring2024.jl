@@ -35,11 +35,7 @@ For example:
 function freqdist(iter)
     dict = Dict{Char, Integer}()
     for item in iter
-        if haskey(dict, item)
-            dict[item] +=1
-        else
-            dict[item] = 1
-        end
+        haskey(dict, item) ? dict[item] +=1 : (dict[item] = 1)
     end
     return dict
 end
@@ -59,7 +55,6 @@ Example:
 """
 function has_duplicates(arr)
     return (length(Set(arr)) != length(arr)) #if the set which contains unique value is not the same size as arr, it has a dup.
-    ## your code here
 end
 
 ##-------------------------------------------------------------------------
@@ -99,7 +94,7 @@ function prob_same_bday(numpeople)
     samebday = 0
     for rep = 1:5000
         arr = rand(1:365, numpeople)
-        if length(arr) != length(Set(arr)) #we have a dup.
+        if length(arr) != length(Set(arr)) #we have a dup since set contains all the unique vals.
             samebday += 1
         end
     end
@@ -125,7 +120,7 @@ Examples:
     ## returns [(17, 75, 'a'), (35, 60, 'c'), (2, 25, 'd'), (31, 96, 'h')]
 """
 function sort_tuples(arr_tuples, idx)
-    return sort!(arr_tuples, by = e -> e[idx])
+    return sort!(arr_tuples, by = e -> e[idx]) #sort based on idx
 end
 
 
@@ -154,7 +149,21 @@ Example:
     simpsons(x -> x^2, 0, 2, 1000) ## 2.666666666666665
 """
 function simpsons(f, a, b, n)
-    ## your code here...
+    #f: function 
+    h = (b - a) /n  
+    # 2, 4, 2, 4,
+    val = 0 
+    #1,4,2,4,2,4,2,.... 1
+    for i=1:n-1
+        val += (i*2 % 4 == 2) ? 4 *f(a + i*h) : 2 *f(a + i*h) 
+    end
+    
+    return (h/3 * (f(a + 0*h) + f(a + n*h) + val))
+
+end
+
+function calculate_y_(func, val)
+    return 
 end
 
 ##-------------------------------------------------------------------------
@@ -170,7 +179,15 @@ Examples:
 	numwords_with_letter('e', wordlist) ## 44524
 """
 function numwords_with_letter(letter, wordlist)
-    ## your code here
+    count = 0
+    open(wordlist, "r") do fp
+        while !eof(fp)
+            line = readline(fp)
+            # println(line)\
+            occursin(string(letter), line) ? count += 1 : continue
+        end
+    end
+    return count
 end
 
 
@@ -188,7 +205,19 @@ Examples:
 	numwords_with_letter_in_position('q', 6) ## 78
 """
 function numwords_with_letter_in_position(letter, position, wordlist)
-    ## your code here
+    count = 0
+    open(wordlist, "r") do fp
+        while !eof(fp)
+            line = readline(fp)
+            # word = []{String}
+            if (length(line) < position) ##If the position value is greater than the word, skips it to avoid the error. Was made b/c of whitespace at end of file
+                continue
+            end 
+            line[position] == letter ? count+=1 : continue
+            
+        end
+    end
+    return count
 end
 
 ##-------------------------------------------------------------------------
@@ -212,7 +241,16 @@ Dict(
 
 """
 function numwords_each_letter(wordlist)
-    ## your code here
+    dict = Dict{Char, Integer}()
+    open(wordlist, "r") do fp
+        while !eof(fp)
+            line = readline(fp)
+            for values in Set{Char}(line)
+                haskey(dict, values) ? dict[values] +=1 : (dict[values] = 1)
+            end
+        end
+    end
+    return dict
 end
 
 ##TESTING
@@ -226,6 +264,13 @@ function main()
     # println(prob_same_bday(5)) ##WORKS
     # println(prob_same_bday(25)) ##WORKS
     # println(sort_tuples([(35, 60, 'c'), (31, 96, 'h'), (2, 25, 'd'), (17, 75, 'a')], 3)) ##WORKS
+    # println(numwords_with_letter('a', "ECON411/Homework/HW1/wordlist_lawler.txt")) ##WORKS
+    # println(numwords_with_letter('e', "ECON411/Homework/HW1/wordlist_lawler.txt")) ##WORKS
+
+    # println(numwords_with_letter_in_position('a', 1, "ECON411/Homework/HW1/wordlist_lawler.txt")) ##WORKS
+    # println(numwords_each_letter("ECON411/Homework/HW1/wordlist_lawler.txt")) ##WORKS
+    println(simpsons(x -> x^2, 0, 2, 100))
+    println(simpsons(x -> x^2, 0, 2, 1000))
 
 
 
