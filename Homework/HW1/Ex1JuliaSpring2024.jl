@@ -267,10 +267,12 @@ function main()
     # println(numwords_with_letter('a', "ECON411/Homework/HW1/wordlist_lawler.txt")) ##WORKS
     # println(numwords_with_letter('e', "ECON411/Homework/HW1/wordlist_lawler.txt")) ##WORKS
 
-    # println(numwords_with_letter_in_position('a', 1, "ECON411/Homework/HW1/wordlist_lawler.txt")) ##WORKS
-    # println(numwords_each_letter("ECON411/Homework/HW1/wordlist_lawler.txt")) ##WORKS
-    println(simpsons(x -> x^2, 0, 2, 100))
-    println(simpsons(x -> x^2, 0, 2, 1000))
+    # println(numwords_with_letter_in_position('a', 1, "Julia/Homework/HW1/wordlist_lawler.txt")) ##WORKS
+    # println(numwords_each_letter("Julia/Homework/HW1/wordlist_lawler.txt")) ##WORKS
+
+
+    # println(simpsons(x -> x^2, 0, 2, 100)) ##WORKS
+    # println(simpsons(x -> x^2, 0, 2, 1000)) ##WORKS
 
 
 
