@@ -94,8 +94,8 @@ function prob_same_bday(numpeople)
     samebday = 0
     for rep = 1:5000
         arr = rand(1:365, numpeople)
-        if length(arr) != length(Set(arr)) #we have a dup since set contains all the unique vals.
-            samebday += 1
+        if length(arr) != length(Set(arr)) 
+            samebday += 1 #we have a dup since set contains all the unique vals.
         end
     end
     return samebday / 5000
@@ -261,8 +261,8 @@ function main()
     # has_duplicates([8, 9, 4, 9, 10]) ## should return true. ##WORKS
     # println(has_duplicates([10, 15, 5, 8])) ##WORKS
     # println(has_duplicates([8, 9, 4, 9, 10])) ##WORKS
-    # println(prob_same_bday(5)) ##WORKS
-    # println(prob_same_bday(25)) ##WORKS
+    println(prob_same_bday(5)) ##WORKS
+    println(prob_same_bday(25)) ##WORKS
     # println(sort_tuples([(35, 60, 'c'), (31, 96, 'h'), (2, 25, 'd'), (17, 75, 'a')], 3)) ##WORKS
     # println(numwords_with_letter('a', "ECON411/Homework/HW1/wordlist_lawler.txt")) ##WORKS
     # println(numwords_with_letter('e', "ECON411/Homework/HW1/wordlist_lawler.txt")) ##WORKS
