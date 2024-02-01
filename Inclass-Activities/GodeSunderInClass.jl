@@ -1,6 +1,8 @@
 module GodeSunderInClass
+import DataFrames as DF
+import Distributions as Dist
 
-
+const unif0200 = Dist.Uniform()
 ##-------------------------------------------------------------------------
 ## Custom Types
 ##-------------------------------------------------------------------------
@@ -29,6 +31,14 @@ end
 Create a dictionary of parameters
 """
 function params()
+    Dict(
+        :Nb => 100,
+        :Ns => 100, 
+        :MinVal => 0.0,
+        :MaxVal => 200,
+        :MinCost => 0,
+        :MaxCost => 200
+    )
 end
 
 
@@ -38,6 +48,12 @@ Create an empty dataframe for storing trades.
 Each trade has four features: rseed, buyer valuation, seller cost and price.
 """
 function init_trades()
+    DF.DataFrame(
+        rseed= Int[],
+        wtp= Float64[],
+        cost= Float64[],
+        price= Float64[]
+    )
 end
 
 ##-------------------------------------------------------------------------
@@ -49,6 +65,12 @@ This is the dataframe for storing the perfectly competitive outcome.
 Required information: rseed, eqmprice, eqmqty, eqmsurplus.
 """
 function init_eqmresults()
+    Df.DataFrame(
+        rseed = int[],
+        eqmprice= Float64[],
+        eqmqty = int[],
+        eqmsurplus = Float64[]
+    )
 end
 
 
@@ -57,6 +79,9 @@ end
 Generate and return the population (array) of buyers.
 """
 function gen_buyers(numbuyers, minval, maxval)
+    unifdist = Dist.Uniform(minval, maxval)
+    buyer_vals = rand(unifdist, numbuyers)
+    [Buyer(i, buyer_vals[i], -Inf) for i = 1:numbuyers] 
 end
 
 
@@ -64,7 +89,10 @@ end
 """
 Generate a population of sellers.
 """
-
+function gen_sellers(numsellers, mincost, maxcost)
+    unifdist = Dist.Uniform(mincost, maxcost)
+    [Seller(i, rand(unifdist), inf) for i=1:numsellers]
+end
 
 ##-------------------------------------------------------------------------
 """
@@ -75,6 +103,30 @@ social surplus (= consumer surplus + producer surplus)
 (referred to as eqmsurplus)
 """
 function calc_eqm(buyers::Array{Buyer, 1}, sellers::Array{Seller, 1})
+    ##sort buyers in a descending order based on willingness to pay.
+    buyers_sort = sort(buyers, by = x -> x.wtp, rev=true) #rev by default it's ascending 
+
+    ## sort sellers  in an ascending order based on cost of production.
+    sellers_sort = sort(sellers, by = x -> x.cost)
+    ## Calculate equilibrium quantity.
+        ## This is the highest quality q such that wtp(buyer in post q) >= cost(seller in pos q)
+    eqm_qty = 0
+    for (idx, buyer) in enumerate(buyers_sorted)
+        if buyer.wtp >= sellers_sort[idx].cost 
+            eqm_qty += 1
+        else
+            break
+        end
+    end
+    ## Calculate surplus 
+        ## For every buyer and seller form pos 1 to q, calculate the wtp - cost and then sum those. 
+    surplus = 0
+    for qty=1:eqm_qty
+        surplus += buyers_sort[qty].wtp - sellers_sort[qty].cost
+    end
+    ## Calculate equilibrium price
+        ## (willingness to pay - cost)/2 for buyer and seller in position q.
+    ##r return these things as a dictionary. 
 end
 
 
