@@ -65,7 +65,7 @@ This is the dataframe for storing the perfectly competitive outcome.
 Required information: rseed, eqmprice, eqmqty, eqmsurplus.
 """
 function init_eqmresults()
-    Df.DataFrame(
+    DF.DataFrame(
         rseed = int[],
         eqmprice= Float64[],
         eqmqty = int[],
@@ -81,7 +81,7 @@ Generate and return the population (array) of buyers.
 function gen_buyers(numbuyers, minval, maxval)
     unifdist = Dist.Uniform(minval, maxval)
     buyer_vals = rand(unifdist, numbuyers)
-    [Buyer(i, buyer_vals[i], -Inf) for i = 1:numbuyers] 
+    [Buyer(i, buyer_vals[i], -Inf) for i=1:numbuyers] 
 end
 
 
@@ -91,7 +91,7 @@ Generate a population of sellers.
 """
 function gen_sellers(numsellers, mincost, maxcost)
     unifdist = Dist.Uniform(mincost, maxcost)
-    [Seller(i, rand(unifdist), inf) for i=1:numsellers]
+    [Seller(i, rand(unifdist), Inf) for i=1:numsellers]
 end
 
 ##-------------------------------------------------------------------------
@@ -104,28 +104,37 @@ social surplus (= consumer surplus + producer surplus)
 """
 function calc_eqm(buyers::Array{Buyer, 1}, sellers::Array{Seller, 1})
     ##sort buyers in a descending order based on willingness to pay.
-    buyers_sort = sort(buyers, by = x -> x.wtp, rev=true) #rev by default it's ascending 
-
+    buyers_sorted = sort(buyers, by = x -> x.wtp, rev=true) #rev by default it's ascending 
     ## sort sellers  in an ascending order based on cost of production.
-    sellers_sort = sort(sellers, by = x -> x.cost)
-    ## Calculate equilibrium quantity.
+    sellers_sorted = sort(sellers, by = x -> x.cost)
+    ## Calculate equilibrium quantity and surplus. 
         ## This is the highest quality q such that wtp(buyer in post q) >= cost(seller in pos q)
     eqm_qty = 0
-    for (idx, buyer) in enumerate(buyers_sorted)
-        if buyer.wtp >= sellers_sort[idx].cost 
+    surplus = 0.0
+
+    for (buyer, seller) in zip(buyers_sorted, sellers_sorted)
+        diff = buyer.wtp - seller.cost
+        if diff >= 0
             eqm_qty += 1
+            surplus += diff
         else
             break
         end
+
+        eqm_price = (buyers_sorted[eqm_qty].wtp + sellers_sorted[eqm_qty].cost) / 2.0
+
+        #return these three as a dictionary
+        return Dict(
+            :eqm_qty => eqm_qty, 
+            :eqm_price => eqm_price, 
+            :eqm_surplus => surplus
+        )
+
     end
-    ## Calculate surplus 
-        ## For every buyer and seller form pos 1 to q, calculate the wtp - cost and then sum those. 
-    surplus = 0
-    for qty=1:eqm_qty
-        surplus += buyers_sort[qty].wtp - sellers_sort[qty].cost
-    end
+    
     ## Calculate equilibrium price
         ## (willingness to pay - cost)/2 for buyer and seller in position q.
+
     ##r return these things as a dictionary. 
 end
 
@@ -137,6 +146,10 @@ subject to the constraint that they don't pay more than their valuation.
 Given buyers array, update the array with their bid.
 """
 function gen_bids!(buyers :: Array{Buyer, 1})
+    for buyer in buyers
+        unifdist = Dist.Uniform(0.0, buyer.wtp)
+        buyer.bid = rand(unifdist)
+    end
 end
 
 
@@ -147,6 +160,12 @@ subject to the constraint that they don't ask for less than their cost.
 Given the sellers array, update the array with their asks.
 """
 function gen_asks!(sellers :: Array{Seller, 1}, maxval)
+    for seller in sellers
+        if seller.cost < maxval
+            unifdist = Dist.Uniform(seller.cost, maxval)
+            seller.ask = rand(unifdist)
+        end
+    end
 end
 
 ##-------------------------------------------------------------------------
