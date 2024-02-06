@@ -33,7 +33,7 @@ For example:
     and they have the correct value.
 """
 function freqdist(iter)
-    dict = Dict{Char, Integer}()
+    dict = Dict{Any, Integer}()
     for item in iter
         haskey(dict, item) ? dict[item] +=1 : (dict[item] = 1)
     end
@@ -180,13 +180,9 @@ Examples:
 """
 function numwords_with_letter(letter, wordlist)
     count = 0
-    open(wordlist, "r") do fp
-        while !eof(fp)
-            line = readline(fp)
-            # println(line)\
-            occursin(string(letter), line) ? count += 1 : continue
+        for iter in wordlist
+            occursin(string(letter), iter) ? count += 1 : continue
         end
-    end
     return count
 end
 
@@ -206,16 +202,11 @@ Examples:
 """
 function numwords_with_letter_in_position(letter, position, wordlist)
     count = 0
-    open(wordlist, "r") do fp
-        while !eof(fp)
-            line = readline(fp)
-            # word = []{String}
-            if (length(line) < position) ##If the position value is greater than the word, skips it to avoid the error. Was made b/c of whitespace at end of file
-                continue
-            end 
-            line[position] == letter ? count+=1 : continue
-            
-        end
+    for iter in wordlist
+        if (length(iter) < position) ##If the position value is greater than the word, skips it to avoid the error. Was made b/c of whitespace at end of file
+            continue
+        end 
+        iter[position] == letter ? count+=1 : continue
     end
     return count
 end
@@ -241,15 +232,13 @@ Dict(
 
 """
 function numwords_each_letter(wordlist)
-    dict = Dict{Char, Integer}()
-    open(wordlist, "r") do fp
-        while !eof(fp)
-            line = readline(fp)
-            for values in Set{Char}(line)
-                haskey(dict, values) ? dict[values] +=1 : (dict[values] = 1)
+    dict = Dict{Any, Integer}()
+        for values in wordlist
+            for value in Set{Char}(values)
+                haskey(dict, value) ? dict[value] +=1 : (dict[value] = 1)
             end
         end
-    end
+
     return dict
 end
 
@@ -257,18 +246,33 @@ end
 
 function main()
     # println(freqdist("hello world")) ##WORKS
+    # println(freqdist([5, 1, 5, 3, 5, 2, 6, 2, 2, 5]))
     # has_duplicates([10, 15, 5, 8]) ## should return false. ##WORKS
     # has_duplicates([8, 9, 4, 9, 10]) ## should return true. ##WORKS
     # println(has_duplicates([10, 15, 5, 8])) ##WORKS
     # println(has_duplicates([8, 9, 4, 9, 10])) ##WORKS
-    println(prob_same_bday(5)) ##WORKS
-    println(prob_same_bday(25)) ##WORKS
+    # println(prob_same_bday(5)) ##WORKS
+    # println(prob_same_bday(25)) ##WORKS
     # println(sort_tuples([(35, 60, 'c'), (31, 96, 'h'), (2, 25, 'd'), (17, 75, 'a')], 3)) ##WORKS
-    # println(numwords_with_letter('a', "ECON411/Homework/HW1/wordlist_lawler.txt")) ##WORKS
-    # println(numwords_with_letter('e', "ECON411/Homework/HW1/wordlist_lawler.txt")) ##WORKS
+    arr = []
+    open("Julia/Homework/HW1/wordlist_lawler.txt", "r") do fp
+        while !eof(fp)
+            line = readline(fp)
+            push!(arr, line)
+            end
+        end
 
-    # println(numwords_with_letter_in_position('a', 1, "Julia/Homework/HW1/wordlist_lawler.txt")) ##WORKS
-    # println(numwords_each_letter("Julia/Homework/HW1/wordlist_lawler.txt")) ##WORKS
+
+    # print(arr)
+    println(numwords_with_letter('a', arr)) ##WORKS
+    println(numwords_with_letter('e', arr)) ##WORKS
+
+
+    println(numwords_with_letter("i", ["i", "like", "computational", "economics"])) ##WORKS
+    println(numwords_with_letter("z", ["i", "like", "computational", "economics"])) ##WORKS
+
+    println(numwords_with_letter_in_position('a', 1, arr)) ##WORKS
+    println(numwords_each_letter(arr)) ##WORKS
 
 
     # println(simpsons(x -> x^2, 0, 2, 100)) ##WORKS
@@ -279,6 +283,4 @@ function main()
 end
 
 main()
-
-
 end ## end module
