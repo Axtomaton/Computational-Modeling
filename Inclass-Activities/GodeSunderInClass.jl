@@ -1,6 +1,8 @@
 module GodeSunderInClass
+
 import DataFrames as DF
 import Distributions as Dist
+import StatsBase as SB
 
 const unif0200 = Dist.Uniform()
 ##-------------------------------------------------------------------------
@@ -175,6 +177,8 @@ When a buyer engages in a trade, we remove that buyer from the list of
 potential buyers.
 """
 function remove_buyer(buyers :: Array{Buyer, 1}, buyer_to_rem :: Buyer)
+    filter!(b -> b.id != buyer_to_rem.id, buyers)
+
 end
 
 ##-------------------------------------------------------------------------
@@ -184,6 +188,8 @@ When a seller engages in a trade, we remove that seller from the list of
 potential sellers.
 """
 function remove_seller(sellers :: Array{Seller, 1}, seller_to_rem :: Seller)
+    filter!(s -> s.id != seller_to_rem.id, sellers)
+
 end
 
 
@@ -196,6 +202,36 @@ Return the dataframe consisting of these three columns.
 function calc_trades(buyers :: Array{Buyer, 1},
                      sellers :: Array{Seller, 1},
                      maxval)
+    trade = DF.DataFrame(
+        wtp= Float64[],
+        cost= Float64[],
+        price= Float64[]
+    )
+    buyers = 
+
+    start_time = time()
+    while time() <= start_time + 2
+        gen_bids!(buyers)
+        gen_asks!(sellers, maxval)
+        sorted_buyers = sort(buyers, by = b -> b.bid, rev=true)
+        sorted_sellers = sort(sellers, by = s -> s.ask)
+        max_poss_qty = 0
+        for (buyer, seller) in zip(sorted_buyers, sorted_sellers)
+            if buyer.bid >= seller.ask
+                max_poss_qty += 1
+            else
+                break
+            end
+        end
+        trading_buyer = SB.sample(sorted_buyers[1:max_poss_qty])
+        trading_seller = SB.sample(sorted_sellers[1:max_poss_qty])
+        push!(trades, 
+            [trading_buyer.wtp, 
+            trading_seller.cost, 
+            trading_buyer.bid])
+        ## we need to remove seller and buyer from the population. 
+        
+    end
 
 end
 
