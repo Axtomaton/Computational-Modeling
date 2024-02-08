@@ -229,8 +229,9 @@ function calc_trades(buyers :: Array{Buyer, 1},
             [trading_buyer.wtp, 
             trading_seller.cost, 
             trading_buyer.bid])
+        remove_buyer(buyers, trading_buyer)
+        remove_seller(sellers, trading_seller)
         ## we need to remove seller and buyer from the population. 
-        
     end
 
 end
@@ -265,6 +266,16 @@ and trade price as columns.
 Returns a dictionary with three values (surplus, quantity and avgprice)
 """
 function marketagg(mkt_trades)
+    ss = sum(mkt_trades.wtp - mkt_trades.cost)
+    quantity = size(mkt_trades)[1]
+    avgprice = Sb.mean(mkt_trades.price)
+
+    return Dict(
+                :surplus => ss,
+                :quantity => quantity,
+                :avgprice => avgprice
+                )
+
 end
 
 
@@ -273,6 +284,50 @@ Run multiple replications of the simulation
 """
 function run_reps(numreps :: Int64,
                   params)
+    eqmdf = DataFrame(
+        rseed = Int[],
+        eqm_quantity = Int[],
+        eqm_price = Float[],
+        eqm_surplus = Float[]
+    )
+
+    zires = Df.DataFrame(
+        rseed = Int[],
+        zi_quantity = Int[],
+        zi_avgprice = Float[],
+        zi_surplus = Float[]
+    )
+
+    for rep=1:numreps
+        Random.seed!(rep)
+        
+        buyers = gen_buyers(params[:Nb], 
+                            params[:MinVal], 
+                            params[:MaxVal])
+
+        sellers = gen_sellers(params[:Ns],
+                            params[:MinCost], 
+                            params[:MaxCost])
+
+        buyerscopy = deepcopy(buyers)
+        sellerscopy = deepcopy(sellers)
+
+        tradesdf = calc_trades(buyerscopy, sellerscopy, params[:MaxVal])
+        mktagg = marketagg(tradesdf)
+
+        mktagg[:rseed] = rep
+        push!(zires, mktagg)
+
+        #calcualte the equilibrium
+        eqmres = calc_eqm(buyers, sellers)
+        
+        #add the equilibrium to the eqm
+        eqmres[:rseed] = rep
+        push!(eqmdf, eqmres)
+
+
+    end
+    return (eqmdf, zires)
 end
 
 
@@ -281,14 +336,6 @@ end
 ## Efficiency can be defined as the ratio:
 ## Surplus in the GS Mkt / Surplus in the perfectly competitive eqm.
 function efficiency(eqmdf, gsmktdf)
+
 end
-
-
-
-
-
-
-
-
-
 end
