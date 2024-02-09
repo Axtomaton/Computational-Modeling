@@ -162,10 +162,6 @@ function simpsons(f, a, b, n)
 
 end
 
-function calculate_y_(func, val)
-    return 
-end
-
 ##-------------------------------------------------------------------------
 """
 Write a function that takes a letter and an array of words as an argument 
@@ -271,8 +267,14 @@ function main()
     println(numwords_with_letter("i", ["i", "like", "computational", "economics"])) ##WORKS
     println(numwords_with_letter("z", ["i", "like", "computational", "economics"])) ##WORKS
 
-    println(numwords_with_letter_in_position('a', 1, arr)) ##WORKS
-    println(numwords_each_letter(arr)) ##WORKS
+    println(numwords_with_letter('b', ["intelligence", "is", "the", "ability", "t...et", "getting", "the", "work", "done.", "linus", "torvalds"]))
+
+    # println(numwords_with_letter_in_position('a', 1, arr)) ##WORKS
+    # println(numwords_with_letter_in_position('z', 1, arr)) ##WORKS
+    # println(numwords_with_letter_in_position('i', 4, arr)) ##WORKS
+
+
+    # println(numwords_each_letter(arr)) ##WORKS
 
 
     # println(simpsons(x -> x^2, 0, 2, 100)) ##WORKS
