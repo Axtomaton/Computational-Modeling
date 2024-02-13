@@ -338,4 +338,14 @@ end
 function efficiency(eqmdf, gsmktdf)
 
 end
+
+function main(n:int64)
+    for i=1:n
+        println("Replicaiton num: $(i)")
+        
+    end
+
+end
+
+
 end
