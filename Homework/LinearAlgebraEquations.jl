@@ -39,12 +39,16 @@ import LinearAlgebra as LA
                                   1.75 ]
 """
 function forward_substitution(L, b)
+    m = size(L, 1)
+    z = similar(b, Float64)  # Initialize z with the same size as b
 
+    for i in 1:m
+        z[i] = (b[i] - sum(L[i, 1:i-1] .* z[1:i-1])) / L[i, i]
+    end
 
-
-
-    
+    return vec(z)
 end
+
 
 
 ##------------------------------------------------------------------------------
@@ -66,8 +70,15 @@ end
     Return value should be the matrix P.
 """
 function swap_rows_1_2_matrix(A)
-
+    m, n = size(A) #num of rows and columns from matrix A
+    P = Matrix{typeof(A[1, 1])}(LA.I, m, n)  # Create an identity matrix of size m x m
+    # Swap the first two rows of P
+    P[1, :], P[2, :] = P[2, :], P[1, :]
+    return P
 end
+
+
+
 
 
 ##------------------------------------------------------------------------------
@@ -145,4 +156,29 @@ function cournot_equilibrium(R, b, costvec)
 end
 
 
+
+
+function main()
+
+# L = [1 0 0; 
+#     1 2 0; 
+#     2 1 4]
+
+# b = [2, 4, 8]
+# println(forward_substitution(L, b))
+
+A = [2 1 3;
+    3 4 2;
+    1 5 6]
+
+P = swap_rows_1_2_matrix(A)
+println(P * A) #LOOKS GOOD!!
+
+
+
+
+
+end
+
+main()
 end ## end module
