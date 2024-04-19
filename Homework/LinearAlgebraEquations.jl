@@ -39,14 +39,14 @@ import LinearAlgebra as LA
                                   1.75 ]
 """
 function forward_substitution(L, b)
-    m = size(L, 1)
-    z = similar(b, Float64)  # Initialize z with the same size as b
+    m = size(L, 1) # Get the number of rows of L 
+    z = similar(b, Float64)  # Initialize z with the same size as b and type Float64
 
-    for i in 1:m
-        z[i] = (b[i] - sum(L[i, 1:i-1] .* z[1:i-1])) / L[i, i]
+    for i in 1:m # Loop through the rows of L
+        z[i] = (b[i] - sum(L[i, 1:i-1] .* z[1:i-1])) / L[i, i] # Calculate z[i]
     end
 
-    return vec(z)
+    return vec(z) # Return z as a one-dimensional vector
 end
 
 
@@ -72,8 +72,7 @@ end
 function swap_rows_1_2_matrix(A)
     m, n = size(A) #num of rows and columns from matrix A
     P = Matrix{typeof(A[1, 1])}(LA.I, m, n)  # Create an identity matrix of size m x m
-    # Swap the first two rows of P
-    P[1, :], P[2, :] = P[2, :], P[1, :]
+    P[1, :], P[2, :] = P[2, :], P[1, :] #     # Swap the first two rows of P
     return P
 end
 
@@ -106,7 +105,21 @@ end
     You can assume that A has at least two rows.
 """
 function calc_L1L2matrices(A)
+    m = size(A, 1)
+    lower_matrix = Vector{Array{Float64, 2}}()
+
+    for k in 1:m-1
+        L = Matrix{Float64}(LA.I, m, m)  # init L as an identity matrix
+        for i in k+1:m
+            multiplier = A[i,k] / A[k,k]
+            L[i,k] = -multiplier  # Update the lower triangular part of L
+            A[i,:] .-= multiplier .* A[k, :]  # apply the transformation to A
+        end
+        push!(lower_matrix, copy(L)) # append L to the list of lower triangular matrices
+    end
+    return lower_matrix
 end
+
 
 
 ##------------------------------------------------------------------------------
@@ -118,7 +131,9 @@ end
     symmetric positive definite matrix.
 """
 function cholesky_decomposition(A)
+    return LA.cholesky(A).L #use built in function
 end
+
 
 
 ##------------------------------------------------------------------------------
@@ -135,6 +150,8 @@ end
     triangular matrix.
 """
 function qrfactorization(A)
+    Q, R = LA.qr(A) #use built in function
+    return Q, R #return Q and R as a tuple
 end
 
 
@@ -153,9 +170,25 @@ end
        expected output = [8.888888888888888, 5.555555555555556]
 """
 function cournot_equilibrium(R, b, costvec)
+    n = length(costvec) # firms
+    A = zeros(Float64, n, n) # populate coefficient matrix
+    c = zeros(Float64, n) # vector of constants
+
+    for i in 1:n
+        for j in 1:n
+            if i == j
+                A[i,j] = 2.0
+            else
+                A[i,j] = 1.0
+            end
+        end
+        c[i] = (Float64(R) - Float64(costvec[i])) / Float64(b)
+    end
+
+    q = A \ c
+
+    return q
 end
-
-
 
 
 function main()
@@ -165,20 +198,50 @@ function main()
 #     2 1 4]
 
 # b = [2, 4, 8]
-# println(forward_substitution(L, b))
+# println(forward_substitution(L, b)) #LOOKS GOOD!!
 
-A = [2 1 3;
-    3 4 2;
-    1 5 6]
+#QUESTION 2 
+# A = [2 1 3;
+#     3 4 2;
+#     1 5 6]
 
-P = swap_rows_1_2_matrix(A)
-println(P * A) #LOOKS GOOD!!
+# P = swap_rows_1_2_matrix(A)
+# println(P * A) #LOOKS GOOD!!
+
+#QUESTION 3
+# A = [ 26.0  22.0  15.0
+#           22.0  19.0  13.0
+#           15.0  13.0   9.0]
+
+# println(calc_L1L2matrices(A))
+# LOOKS GOOD!
+
+#QUESTION 4
+# A = [10.0 3.0 4.0;
+#      3.0 10.0 5.0;
+#      4.0 5.0 13.0]
+    
+# decomp = cholesky_decomposition(A)
+# println(decomp)
 
 
+#QUESTION 5
+# Define a matrix A
+A = [1.0 2.0 3.0;
+     4.0 5.0 6.0;
+     7.0 8.0 9.0]
 
+# Perform QR factorization
+Q, R = qrfactorization(A) 
 
+# Check if Q * R equals A
+println(Q * R ≈ A)  # Should return true for equality 
+
+#QUESTION 6
+# println(cournot_equilibrium(100, 3, [40, 40])) #YES
+# println(cournot_equilibrium(100, 3, [30, 40])) #YES
 
 end
 
-main()
+# main()
 end ## end module
